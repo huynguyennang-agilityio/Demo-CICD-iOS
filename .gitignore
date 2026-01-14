@@ -1,0 +1,6 @@
+swiftui-basics/.swiftformat
+swiftui-basics/.swiftlint.yml
+swiftui-basics/SETUP-GUIDE.md
+swiftui-basics/test_file.swift
+swiftui-basics/.github/workflows/ci.yml
+swiftui-basics/scripts/setup-dev.sh
