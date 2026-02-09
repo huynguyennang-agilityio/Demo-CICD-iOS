@@ -138,7 +138,7 @@ platform :ios do
   lane :test do
     run_tests(
       scheme: "DemoCICD",
-      devices: ["iPhone 16"],
+      devices: ["iPhone 16", "iPhone 17"],
       clean: true
     )
   end
