@@ -16,7 +16,7 @@ platform :ios do
     match(type: "adhoc", readonly: true)
   end
 
-  desc "Tạo mới hoặc regenerate certificates (chỉ chạy khi cần)"
+  desc "Create or regenerate certificates (only run when needed)"
   lane :create_certs do
     match(type: "development", readonly: false)
     match(type: "adhoc", readonly: false)
@@ -26,7 +26,7 @@ platform :ios do
   # BUILD
   # =====================
 
-  desc "Build Development (chạy trên device)"
+  desc "Build Development (run on device)"
   lane :build_dev do
     match(type: "development", readonly: true)
 
@@ -52,7 +52,7 @@ platform :ios do
     )
   end
 
-  desc "Build Ad Hoc (distribute nội bộ)"
+  desc "Build Ad Hoc (internal distribution)"
   lane :build_adhoc do
     match(type: "adhoc", readonly: true)
 
@@ -84,6 +84,8 @@ platform :ios do
 
   desc "Build and upload to TestFlight"
   lane :build_testflight do
+    setup_ci
+
     api_key = app_store_connect_api_key(
       key_id: ENV["ASC_KEY_ID"],
       issuer_id: ENV["ASC_ISSUER_ID"],

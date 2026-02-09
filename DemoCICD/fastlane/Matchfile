@@ -1,9 +1,9 @@
-git_url("git@github.com:huynguyennang-agilityio/certificates.git") # URL repo lưu certificates
+git_url("git@github.com:huynguyennang-agilityio/certificates.git") # Git repo to store certificates & profiles
 
 storage_mode("git")
 
-type("development") # default type, có thể override khi gọi lane
+type("development") # Default type, can be overridden when calling a lane
 
 app_identifier(["huy.demo.DemoCICD", "huynang.Demo"])
-username("nanghuy11t2@gmail.com") # Apple ID email của bạn
+username("nanghuy11t2@gmail.com") # Your Apple ID email
 team_id("KHAR8S7L52")
