@@ -1,0 +1,144 @@
+default_platform(:ios)
+
+platform :ios do
+
+  # =====================
+  # MATCH - Sync certificates & profiles
+  # =====================
+
+  desc "Sync Development certificates"
+  lane :sync_dev_certs do
+    match(type: "development", readonly: true)
+  end
+
+  desc "Sync Ad Hoc certificates"
+  lane :sync_adhoc_certs do
+    match(type: "adhoc", readonly: true)
+  end
+
+  desc "Tạo mới hoặc regenerate certificates (chỉ chạy khi cần)"
+  lane :create_certs do
+    match(type: "development", readonly: false)
+    match(type: "adhoc", readonly: false)
+  end
+
+  # =====================
+  # BUILD
+  # =====================
+
+  desc "Build Development (chạy trên device)"
+  lane :build_dev do
+    match(type: "development", readonly: true)
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      team_id: "KHAR8S7L52",
+      bundle_identifier: "huy.demo.DemoCICD",
+      profile_name: ENV["sigh_huy.demo.DemoCICD_development_profile-name"],
+      code_sign_identity: "iPhone Developer"
+    )
+
+    build_app(
+      scheme: "DemoCICD",
+      export_method: "development",
+      output_directory: "./build",
+      output_name: "DemoCICD-Dev.ipa",
+      clean: true,
+      export_options: {
+        provisioningProfiles: {
+          "huy.demo.DemoCICD" => ENV["sigh_huy.demo.DemoCICD_development_profile-name"]
+        }
+      }
+    )
+  end
+
+  desc "Build Ad Hoc (distribute nội bộ)"
+  lane :build_adhoc do
+    match(type: "adhoc", readonly: true)
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      team_id: "KHAR8S7L52",
+      bundle_identifier: "huy.demo.DemoCICD",
+      profile_name: ENV["sigh_huy.demo.DemoCICD_adhoc_profile-name"],
+      code_sign_identity: "iPhone Distribution"
+    )
+
+    build_app(
+      scheme: "DemoCICD",
+      export_method: "ad-hoc",
+      output_directory: "./build",
+      output_name: "DemoCICD-AdHoc.ipa",
+      clean: true,
+      export_options: {
+        provisioningProfiles: {
+          "huy.demo.DemoCICD" => ENV["sigh_huy.demo.DemoCICD_adhoc_profile-name"]
+        }
+      }
+    )
+  end
+
+  # =====================
+  # TESTFLIGHT
+  # =====================
+
+  desc "Build and upload to TestFlight"
+  lane :build_testflight do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: true
+    )
+
+    match(
+      type: "appstore",
+      readonly: true,
+      api_key: api_key
+    )
+
+    increment_build_number(
+      build_number: ENV["BUILD_NUMBER"] || Time.now.strftime("%Y%m%d%H%M")
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      team_id: "KHAR8S7L52",
+      bundle_identifier: "huy.demo.DemoCICD",
+      profile_name: ENV["sigh_huy.demo.DemoCICD_appstore_profile-name"],
+      code_sign_identity: "iPhone Distribution"
+    )
+
+    build_app(
+      scheme: "DemoCICD",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "DemoCICD.ipa",
+      clean: true,
+      export_options: {
+        provisioningProfiles: {
+          "huy.demo.DemoCICD" => ENV["sigh_huy.demo.DemoCICD_appstore_profile-name"]
+        }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  # =====================
+  # TEST
+  # =====================
+
+  desc "Run unit tests"
+  lane :test do
+    run_tests(
+      scheme: "DemoCICD",
+      devices: ["iPhone 16"],
+      clean: true
+    )
+  end
+
+end

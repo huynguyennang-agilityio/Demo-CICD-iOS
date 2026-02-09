@@ -1,0 +1,3 @@
+app_identifier("huy.demo.DemoCICD")
+apple_id("nanghuy11t2@gmail.com") # Apple ID email của bạn
+team_id("KHAR8S7L52")
